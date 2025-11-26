@@ -3,13 +3,14 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import './index.css'
-import Layout from './layout/Layout.tsx'
+import Layout from './layout/Layout'
+import Dashboard from './pages/Dashboard'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
-    children: [{ index: true, lazy: () => import('./pages/Dashboard.tsx') }],
+    children: [{ index: true, element: <Dashboard /> }],
   },
 ])
 
