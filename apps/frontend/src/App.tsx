@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 
 import Layout from './layout/Layout'
@@ -7,11 +8,13 @@ import Messages from './pages/Messages'
 import Campaigns from './pages/Campaigns'
 import Orders from './pages/Orders'
 import Products from './pages/Products'
+import { ErrorFallback } from './components/ErrorFallback'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <ErrorFallback />,
     children: [
       { index: true, element: <Dashboard /> },
       { path: 'clientes', element: <Clients /> },
@@ -26,5 +29,9 @@ export const router = createBrowserRouter([
 ])
 
 export default function App() {
-  return <RouterProvider router={router} />
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-slate-500">Carregando...</div>}>
+      <RouterProvider router={router} />
+    </Suspense>
+  )
 }
