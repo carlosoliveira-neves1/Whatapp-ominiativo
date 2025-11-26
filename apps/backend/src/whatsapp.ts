@@ -12,7 +12,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const AUTH_FOLDER = path.join(__dirname, '..', 'auth_info')
+const AUTH_FOLDER = process.env.AUTH_FOLDER || path.join(__dirname, '..', 'auth_info')
 
 const logger = pino({ level: 'warn' })
 
@@ -26,6 +26,7 @@ class WhatsAppService {
 
   async connect() {
     console.log('🔄 Starting WhatsApp connection...')
+    console.log('📁 Auth folder:', AUTH_FOLDER)
     
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER)
 
