@@ -13,8 +13,12 @@ type WhatsAppMessage = {
   timestamp: number
 }
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001/ws'
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const PROD_API = 'https://whatapp-ominiativo.onrender.com'
+const DEV_API = 'http://localhost:3001'
+
+const isProd = import.meta.env.PROD
+const API_URL = import.meta.env.VITE_API_URL || (isProd ? PROD_API : DEV_API)
+const WS_URL = import.meta.env.VITE_WS_URL || (isProd ? PROD_API.replace('https', 'wss') + '/ws' : 'ws://localhost:3001/ws')
 
 export function useWhatsApp() {
   const [status, setStatus] = useState<WhatsAppStatus>('disconnected')

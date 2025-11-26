@@ -30,7 +30,6 @@ class WhatsAppService {
     this.socket = makeWASocket({
       auth: state,
       logger,
-      printQRInTerminal: true,
     })
 
     this.socket.ev.on('creds.update', saveCreds)
