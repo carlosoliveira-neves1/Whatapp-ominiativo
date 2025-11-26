@@ -4,10 +4,11 @@ import {
   ArrowPathIcon,
   ArrowRightOnRectangleIcon,
   DevicePhoneMobileIcon,
+  QrCodeIcon,
 } from '@heroicons/react/24/outline'
 
 export default function WhatsAppConnect() {
-  const { status, qrCode, user, logout } = useWhatsApp()
+  const { status, qrCode, user, loading, logout, fetchQRCode } = useWhatsApp()
 
   return (
     <div className="space-y-6">
@@ -85,18 +86,31 @@ export default function WhatsAppConnect() {
                 <DevicePhoneMobileIcon className="h-10 w-10 text-slate-400" />
               </div>
               <h2 className="text-lg font-semibold text-slate-800">
-                {status === 'logged_out' ? 'Sessão encerrada' : 'Conectando...'}
+                {status === 'logged_out' ? 'Sessão encerrada' : 'WhatsApp Desconectado'}
               </h2>
               <p className="mt-2 text-sm text-slate-500">
                 {status === 'logged_out'
-                  ? 'Sua sessão foi encerrada. Aguarde o QR Code para reconectar.'
-                  : 'Aguarde enquanto preparamos a conexão...'}
+                  ? 'Sua sessão foi encerrada. Clique abaixo para reconectar.'
+                  : 'Clique no botão abaixo para gerar o QR Code'}
               </p>
 
-              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">
-                <ArrowPathIcon className="h-4 w-4 animate-spin" />
-                Carregando...
-              </div>
+              <button
+                onClick={fetchQRCode}
+                disabled={loading}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <ArrowPathIcon className="h-5 w-5 animate-spin" />
+                    Gerando QR Code...
+                  </>
+                ) : (
+                  <>
+                    <QrCodeIcon className="h-5 w-5" />
+                    Gerar QR Code
+                  </>
+                )}
+              </button>
             </div>
           )}
         </div>

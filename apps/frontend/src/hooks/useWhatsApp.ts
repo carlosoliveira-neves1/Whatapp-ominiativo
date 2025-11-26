@@ -25,9 +25,74 @@ export function useWhatsApp() {
   const [qrCode, setQrCode] = useState<string | null>(null)
   const [user, setUser] = useState<WhatsAppUser | null>(null)
   const [messages, setMessages] = useState<WhatsAppMessage[]>([])
+  const [loading, setLoading] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)
+  const pollingRef = useRef<number | null>(null)
 
-  const connect = useCallback(() => {
+  // Fetch status from API (works for both Baileys and Z-API)
+  const fetchStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/whatsapp/status`)
+      const data = await response.json()
+      
+      if (data.status === 'connected') {
+        setStatus('connected')
+        setQrCode(null)
+        setUser(data.user)
+      } else {
+        setStatus(data.status || 'disconnected')
+        setUser(null)
+      }
+      
+      return data.status
+    } catch (error) {
+      console.error('Error fetching status:', error)
+      return 'disconnected'
+    }
+  }, [])
+
+  // Fetch QR Code from API (Z-API)
+  const fetchQRCode = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/api/whatsapp/qrcode`)
+      const data = await response.json()
+      
+      if (data.qrCode) {
+        setQrCode(data.qrCode)
+        setStatus('connecting')
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Error fetching QR code:', error)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Start polling for status (Z-API mode)
+  const startPolling = useCallback(() => {
+    if (pollingRef.current) return
+    
+    const poll = async () => {
+      const currentStatus = await fetchStatus()
+      if (currentStatus === 'connected') {
+        // Stop polling when connected
+        if (pollingRef.current) {
+          clearInterval(pollingRef.current)
+          pollingRef.current = null
+        }
+      }
+    }
+    
+    poll() // Initial check
+    pollingRef.current = window.setInterval(poll, 5000) // Poll every 5 seconds
+  }, [fetchStatus])
+
+  // WebSocket connection (Baileys mode)
+  const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
 
     const ws = new WebSocket(WS_URL)
@@ -66,8 +131,7 @@ export function useWhatsApp() {
 
     ws.onclose = () => {
       console.log('WebSocket disconnected')
-      // Reconnect after 3 seconds
-      setTimeout(connect, 3000)
+      setTimeout(connectWebSocket, 3000)
     }
 
     ws.onerror = (error) => {
@@ -75,13 +139,24 @@ export function useWhatsApp() {
     }
   }, [])
 
+  // Initialize - try WebSocket first, fallback to polling
   useEffect(() => {
-    connect()
+    // Check initial status
+    fetchStatus()
+    
+    // Try WebSocket connection
+    connectWebSocket()
+    
+    // Also start polling as fallback for Z-API
+    startPolling()
 
     return () => {
       wsRef.current?.close()
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+      }
     }
-  }, [connect])
+  }, [connectWebSocket, fetchStatus, startPolling])
 
   const sendMessage = async (to: string, message: string) => {
     const response = await fetch(`${API_URL}/api/whatsapp/send`, {
@@ -118,7 +193,10 @@ export function useWhatsApp() {
     qrCode,
     user,
     messages,
+    loading,
     sendMessage,
     logout,
+    fetchQRCode,
+    fetchStatus,
   }
 }
