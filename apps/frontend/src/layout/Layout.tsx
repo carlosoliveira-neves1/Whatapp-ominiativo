@@ -7,10 +7,12 @@ import {
   ShoppingBagIcon,
   RectangleStackIcon,
   ArrowRightOnRectangleIcon,
+  DevicePhoneMobileIcon,
 } from '@heroicons/react/24/outline'
 
 const navigation = [
   { label: 'Dashboard', to: '/', icon: HomeIcon, exact: true },
+  { label: 'Conexão WhatsApp', to: '/whatsapp', icon: DevicePhoneMobileIcon },
   { label: 'Clientes', to: '/clientes', icon: UsersIcon },
   { label: 'Enviar Mensagens', to: '/mensagens', icon: ChatBubbleLeftRightIcon },
   { label: 'Campanhas', to: '/campanhas', icon: MegaphoneIcon },

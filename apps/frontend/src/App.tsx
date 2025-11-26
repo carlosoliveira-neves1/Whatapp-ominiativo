@@ -8,6 +8,7 @@ import Messages from './pages/Messages'
 import Campaigns from './pages/Campaigns'
 import Orders from './pages/Orders'
 import Products from './pages/Products'
+import WhatsAppConnect from './pages/WhatsAppConnect'
 import { ErrorFallback } from './components/ErrorFallback'
 
 export const router = createBrowserRouter([
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: 'campanhas', element: <Campaigns /> },
       { path: 'pedidos', element: <Orders /> },
       { path: 'produtos', element: <Products /> },
+      { path: 'whatsapp', element: <WhatsAppConnect /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
