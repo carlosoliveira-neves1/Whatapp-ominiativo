@@ -8,7 +8,9 @@ apps/backend/dist/
 
 # Environment
 .env
-.env.*
+.env.local
+.env.development
+.env.production
 
 # Logs
 logs/
